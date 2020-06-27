@@ -1,5 +1,8 @@
 <template>
-  <div :class="[drawer ? 'drawerComponent' : 'slidingComponent', 'component']">
+  <div
+    :class="[drawer ? 'drawerComponent' : 'slidingComponent', 'component']"
+    class="z-10"
+  >
     <form
       @submit.prevent="$emit('formSubmitted')"
       class="bg-black shadow-md rounded-t-none px-8 pt-6 pb-8 mb-4"

@@ -1,5 +1,8 @@
 <template>
-  <div @click="$emit('clicked')" class="container">
+  <div
+    @click="$emit('clicked')"
+    class="container"
+  >
     <base-card
       v-for="(card, index) in mockData"
       :key="index"
@@ -9,6 +12,8 @@
       :published="card.publishDate"
       :blogImage="card.blogImage"
       :authorImage="card.authorImage"
+      :showEdit="loggedIn"
+      :showDelete="loggedIn"
     >
     </base-card>
   </div>
@@ -16,6 +21,8 @@
 
 <script>
 import BaseCard from "@/components/BaseCard";
+import { mapState } from "vuex";
+
 export default {
   name: "LoginPage",
 
@@ -32,31 +39,36 @@ export default {
           blogImage:
             "http://localhost:8080/rest_movieApp/api/image/book_nature.jpg",
           authorImage:
-            "http://localhost:8080/rest_movieApp/api/image/Henry_David_Thoreau.jpg",
+            "http://localhost:8080/rest_movieApp/api/image/Henry_David_Thoreau.jpg"
         },
         {},
         {
-          author: "Henry David Thoureau",
-          blogTitle: "Living Outdoors",
+          author: "William Shakesman",
+          blogTitle: "The World",
           snippet:
-            "I went to the woods because I wished to live deliberately, to front only the essential facts of life, and see if I could not learn what it had to teach, and not, when I came to die, discover that I had not lived.",
+            "All the world's a stage, and all the men and women merely players: they have their exits and their entrances; and one man in his time plays many parts, his acts being seven ages.",
           publishDate: "May 7",
-          blogImage:
-            "http://localhost:8080/rest_movieApp/api/image/book_nature.jpg",
+          blogImage: "http://localhost:8080/rest_movieApp/api/image/stage.jpg",
           authorImage:
-            "http://localhost:8080/rest_movieApp/api/image/Henry_David_Thoreau.jpg",
-        },
-      ],
+            "http://localhost:8080/rest_movieApp/api/image/william-shakespeare.jpg"
+        }
+      ]
     };
   },
 
+  computed: {
+    ...mapState({
+      loggedIn: state => state.loggedIn
+    })
+  },
+
   methods: {
-    formSubmitted() {},
+    formSubmitted() {}
   },
 
   components: {
-    BaseCard,
-  },
+    BaseCard
+  }
 };
 </script>
 
