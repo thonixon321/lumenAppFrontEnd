@@ -1,11 +1,17 @@
 <template>
-  <div :class="[drawer ? 'drawerComponent' : 'slidingComponent', 'component']">
+  <div
+    :class="[drawer ? 'drawerComponent' : 'slidingComponent', 'component']"
+    class="z-10"
+  >
     <form
       @submit.prevent="$emit('formSubmitted')"
       class="bg-black shadow-md rounded-t-none px-8 pt-6 pb-8 mb-4"
     >
       <div class="mb-6">
-        <label class="block text-white text-sm font-bold mb-2" for="search">
+        <label
+          class="block text-white text-sm font-bold mb-2"
+          for="search"
+        >
           Search
         </label>
         <input
@@ -33,9 +39,9 @@ export default {
   props: {
     drawer: {
       type: Boolean,
-      default: false,
-    },
-  },
+      default: false
+    }
+  }
 };
 </script>
 
