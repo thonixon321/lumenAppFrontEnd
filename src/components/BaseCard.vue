@@ -9,7 +9,7 @@
         :style="`background-image: url(${blogImage})`"
       ></div>
       <div class="border-r border-b border-l border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
-        <div class="mb-8">
+        <div class="mb-8 h-64 overflow-hidden">
           <p
             v-if="showEdit === false && showDelete === false"
             class="text-sm text-gray-600 flex items-center"
@@ -29,12 +29,6 @@
           >
             <base-button
               @clicked="changePage"
-              v-if="showEdit || showDelete"
-              :icon="true"
-              type="viewIcon"
-            >
-            </base-button>
-            <base-button
               v-if="showEdit"
               :icon="true"
               type="editIcon"
@@ -51,18 +45,31 @@
             {{ title }}
           </div>
           <p class="text-gray-700 text-base">
-            {{ snippet }}
+            {{ body }}
           </p>
         </div>
-        <div class="flex items-center">
-          <img
-            class="w-10 h-10 rounded-full mr-4"
-            :src="authorImage"
-          />
-          <div class="text-sm">
-            <p class="text-gray-900 leading-none">{{ author }}</p>
-            <p class="text-gray-600">{{ published }}</p>
+        <div class="flex items-center justify-between">
+          <div class='flex items-center'>
+            <img
+              class="w-10 h-10 rounded-full mr-4"
+              :src="authorImage"
+            />
+            <div class="text-sm">
+              <p class="text-gray-900 leading-none italic">{{ author }}</p>
+              <p class="text-gray-600">{{ published }}</p>
+            </div>
           </div>
+          <base-button
+            @clicked="changePage"
+            :icon="false"
+            type="viewIcon"
+          >
+            <a
+              href="#"
+              class="underline"
+              slot="right-text"
+            >Read more</a>
+          </base-button>
         </div>
       </div>
     </div>
@@ -97,10 +104,10 @@ export default {
       default: "How to Code"
     },
 
-    snippet: {
+    body: {
       type: String,
       default:
-        "You get your computer, and make sure there is a keyboard. Making sure the computer is charged or connected to a power outlet, turn your computer on. Put your hands on the keyboard, and then...."
+        "You get your computer, and make sure there is a keyboard. Making sure the computer is charged or connected to a power outlet, turn your computer on. Put your hands on the keyboard, and then.... Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris. Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium. Qui animated corpse, cricket bat max brucks terribilem incessu zomby. The voodoo sacerdos flesh eater, suscitat mortuos comedere carnem virus. Zonbi tattered for solum oculi eorum defunctis go lum cerebro. Nescio brains an Undead zombies. Sicut malus putrid voodoo horror. Nigh tofth eliv ingdead. Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris. Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium. Qui animated corpse, cricket bat max brucks terribilem incessu zomby. The voodoo sacerdos flesh eater, suscitat mortuos comedere carnem virus. Zonbi tattered for solum oculi eorum defunctis go lum cerebro. Nescio brains an Undead zombies. Sicut malus putrid voodoo horror. Nigh tofth eliv ingdead."
     },
 
     published: {
@@ -127,21 +134,42 @@ export default {
 
   methods: {
     changePage(type) {
-      console.log("icon clicked");
-      if (type === "viewIcon") {
-        this.$router.push({
-          name: "ReadBlog",
-          params: {
-            blog: {
-              title: this.title,
-              author: this.author,
-              snippet: this.snippet,
-              published: this.published,
-              blogImage: this.blogImage,
-              authorImage: this.authorImage
+      console.log(type);
+
+      if (this.showEdit || this.showDelete) {
+        if (type === "viewIcon") {
+          this.$router.push({
+            name: "Blog",
+            params: {
+              blog: {
+                readonly: true,
+                title: this.title,
+                author: this.author,
+                body: this.body,
+                published: this.published,
+                blogImage: this.blogImage,
+                authorImage: this.authorImage
+              }
             }
-          }
-        });
+          });
+        } else if (type === "editIcon") {
+          this.$router.push({
+            name: "Blog",
+            params: {
+              blog: {
+                readonly: false,
+                title: this.title,
+                author: this.author,
+                body: this.body,
+                published: this.published,
+                blogImage: this.blogImage,
+                authorImage: this.authorImage
+              }
+            }
+          });
+        }
+      } else {
+        this.sendAlert();
       }
     },
 
