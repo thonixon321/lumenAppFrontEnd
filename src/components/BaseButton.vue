@@ -43,7 +43,7 @@ export default {
   display: none;
 }
 
-.viewIconButton {
+/* .viewIconButton {
   border-radius: 50%;
   color: rgb(48, 28, 97);
   background: rgb(235, 235, 238);
@@ -53,7 +53,7 @@ export default {
   justify-content: center;
   align-items: center;
   margin-right: 0.51em;
-}
+} */
 
 .trashIconButton {
   border-radius: 50%;

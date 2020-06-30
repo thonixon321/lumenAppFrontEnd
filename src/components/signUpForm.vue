@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="[drawer ? 'drawerComponent' : 'slidingComponent', 'component']"
+    :class="[drawer ? 'drawerComponent' : 'slidingComponent', errorShake ? 'errorShake' : '']"
     class="z-10"
   >
     <form
@@ -15,11 +15,18 @@
           Name
         </label>
         <input
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          v-model="name"
+          :class="{ error: msg.name !== null}"
+          class="shadow mb-2 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="name"
           type="text"
           placeholder="Name"
+          @input="msg.name = null"
         />
+        <p
+          v-if="msg.name"
+          class='text-red-500 text-xs italic'
+        >{{ msg.name }}</p>
       </div>
       <div class="mb-4">
         <label
@@ -29,11 +36,18 @@
           Email
         </label>
         <input
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          v-model="email"
+          :class="{ error: msg.email !== null}"
+          class="shadow mb-2 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="email"
           type="text"
           placeholder="email"
+          @input="msg.email = null"
         />
+        <p
+          v-if="msg.email"
+          class='text-red-500 text-xs italic'
+        >{{ msg.email }}</p>
       </div>
       <div class="mb-4">
         <label
@@ -43,18 +57,18 @@
           Password
         </label>
         <input
-          :class="{ error: feedback }"
-          class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+          v-model="password"
+          :class="{ error: msg.password !== null}"
+          class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 mb-2 leading-tight focus:outline-none focus:shadow-outline"
           id="password"
           type="password"
           placeholder="******************"
+          @input="msg.password = null, msg.passwordConfirmed = null, passwordConfirmed = null"
         />
         <p
-          v-if="feedback"
-          class="text-red-500 text-xs italic"
-        >
-          Please choose a password.
-        </p>
+          v-if="msg.password"
+          class='text-red-500 text-xs italic'
+        >{{ msg.password }}</p>
       </div>
       <div class="mb-6">
         <label
@@ -64,18 +78,18 @@
           Confirm Password
         </label>
         <input
-          :class="{ error: feedback }"
-          class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+          v-model="passwordConfirmed"
+          :class="{ error: msg.passwordConfirmed !== null}"
+          class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 mb-2 leading-tight focus:outline-none focus:shadow-outline"
           id="confirm_password"
           type="password"
           placeholder="******************"
+          @input="msg.passwordConfirmed = null"
         />
         <p
-          v-if="feedback"
-          class="text-red-500 text-xs italic"
-        >
-          Please choose a password.
-        </p>
+          v-if="msg.passwordConfirmed"
+          class='text-red-500 text-xs italic'
+        >{{ msg.passwordConfirmed }}</p>
       </div>
       <div class="flex items-center justify-between">
         <button
@@ -97,33 +111,98 @@ export default {
     drawer: {
       type: Boolean,
       default: false
-    },
-
-    feedback: {
-      type: String
     }
   },
 
-  methods: {
-    formSubmitted() {
-      this.$emit("close");
-      //upon successful axios response
-      this.$store.dispatch("updateLoggedInStatus", true);
-      this.$store.dispatch("updateAlert", {
-        alert: true,
-        alertSuccess: true,
-        alertTitle: "Success!",
-        alertMessage: "You were signed up successfully"
-      });
+  data() {
+    return {
+      name: null,
+      email: null,
+      password: null,
+      passwordConfirmed: null,
+      errorShake: false,
+      msg: {
+        name: null,
+        email: null,
+        password: null,
+        passwordConfirmed: null
+      }
+    };
+  },
 
-      setTimeout(() => {
+  methods: {
+    async formSubmitted() {
+      let validFields = await this.validateFields();
+      if (validFields) {
+        this.$emit("close");
+        //upon successful axios response
+        this.$store.dispatch("updateLoggedInStatus", true);
         this.$store.dispatch("updateAlert", {
-          alert: false,
-          alertSuccess: false,
-          alertTitle: "",
-          alertMessage: ""
+          alert: true,
+          alertSuccess: true,
+          alertTitle: "Success!",
+          alertMessage: "You were signed up successfully"
         });
-      }, 1500);
+
+        setTimeout(() => {
+          this.$store.dispatch("updateAlert", {
+            alert: false,
+            alertSuccess: false,
+            alertTitle: "",
+            alertMessage: ""
+          });
+        }, 1500);
+      } else {
+        this.errorShake = true;
+
+        setTimeout(() => {
+          this.errorShake = false;
+        }, 1000);
+      }
+    },
+
+    validateFields() {
+      let validFields = true;
+      //make sure fields are not empty
+      if (this.name === null) {
+        this.msg["name"] = "Name required";
+        validFields = false;
+      }
+      if (this.email === null) {
+        this.msg["email"] = "Email required";
+        validFields = false;
+      }
+      if (this.password === null) {
+        this.msg["password"] = "Password required";
+        validFields = false;
+      }
+      if (this.passwordConfirmed === null) {
+        this.msg["passwordConfirmed"] = "Password confirmation required";
+        validFields = false;
+      }
+
+      if (this.email) {
+        //make sure valid email
+        if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.email)) {
+          this.msg["email"] = null;
+        } else {
+          this.msg["email"] = "Invalid email";
+          validFields = false;
+        }
+      }
+      //check password length
+      if (this.password && this.password.length < 8) {
+        this.msg["password"] = "Password must be at least 8 characters";
+        validFields = false;
+      }
+
+      //passwords need to match
+      if (this.password !== this.passwordConfirmed) {
+        this.msg["passwordConfirmed"] = "Passwords do not match";
+        validFields = false;
+      }
+
+      return validFields;
     }
   }
 };
