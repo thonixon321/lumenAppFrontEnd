@@ -1,58 +1,34 @@
 <template>
-  <div
-    @click="$emit('clicked')"
-    class="container"
-  >
+  <div @click="$emit('clicked')" class="container">
     <base-card
-      v-for="(card, index) in mockData"
+      v-for="(card, index) in blogs"
       :key="index"
-      :author="card.author"
-      :title="card.blogTitle"
-      :body="card.body"
-      :published="card.publishDate"
-      :blogImage="card.blogImage"
-      :authorImage="card.authorImage"
+      :author="card.user.name"
+      :title="card.blog_title"
+      :body="card.blog_body"
+      :published="card.created_at"
+      :blogImage="null"
+      :authorImage="null"
       :showEdit="loggedIn"
       :showDelete="loggedIn"
-    >
-    </base-card>
+    ></base-card>
   </div>
 </template>
 
 <script>
 import BaseCard from "@/components/BaseCard";
 import { mapState } from "vuex";
+import { axiosHandler } from "../mixins/axiosHandler";
 
 export default {
   name: "LoginPage",
 
+  mixins: [axiosHandler],
+
   data() {
     return {
       feedback: null,
-      mockData: [
-        {
-          author: "Henry David Thoureau",
-          blogTitle: "Living Outdoors",
-          body:
-            "I went to the woods because I wished to live deliberately, to front only the essential facts of life, and see if I could not learn what it had to teach, and not, when I came to die, discover that I had not lived. Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris. Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium. Qui animated corpse, cricket bat max brucks terribilem incessu zomby. The voodoo sacerdos flesh eater, suscitat mortuos comedere carnem virus. Zonbi tattered for solum oculi eorum defunctis go lum cerebro. Nescio brains an Undead zombies. Sicut malus putrid voodoo horror. Nigh tofth eliv ingdead.Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris. Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium. Qui animated corpse, cricket bat max brucks terribilem incessu zomby. The voodoo sacerdos flesh eater, suscitat mortuos comedere carnem virus. Zonbi tattered for solum oculi eorum defunctis go lum cerebro. Nescio brains an Undead zombies. Sicut malus putrid voodoo horror. Nigh tofth eliv ingdead.",
-          publishDate: "May 7",
-          blogImage:
-            "http://localhost:8080/rest_movieApp/api/image/book_nature.jpg",
-          authorImage:
-            "http://localhost:8080/rest_movieApp/api/image/Henry_David_Thoreau.jpg"
-        },
-        {},
-        {
-          author: "William Shakesman",
-          blogTitle: "The World",
-          body:
-            "All the world's a stage, and all the men and women merely players: they have their exits and their entrances; and one man in his time plays many parts, his acts being seven ages. Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris. Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium. Qui animated corpse, cricket bat max brucks terribilem incessu zomby. The voodoo sacerdos flesh eater, suscitat mortuos comedere carnem virus. Zonbi tattered for solum oculi eorum defunctis go lum cerebro. Nescio brains an Undead zombies. Sicut malus putrid voodoo horror. Nigh tofth eliv ingdead. Zombie ipsum reversus ab viral inferno, nam rick grimes malum cerebro. De carne lumbering animata corpora quaeritis. Summus brains sit​​, morbo vel maleficia? De apocalypsi gorger omero undead survivor dictum mauris. Hi mindless mortuis soulless creaturas, imo evil stalking monstra adventus resi dentevil vultus comedat cerebella viventium. Qui animated corpse, cricket bat max brucks terribilem incessu zomby. The voodoo sacerdos flesh eater, suscitat mortuos comedere carnem virus. Zonbi tattered for solum oculi eorum defunctis go lum cerebro. Nescio brains an Undead zombies. Sicut malus putrid voodoo horror. Nigh tofth eliv ingdead.",
-          publishDate: "May 7",
-          blogImage: "http://localhost:8080/rest_movieApp/api/image/stage.jpg",
-          authorImage:
-            "http://localhost:8080/rest_movieApp/api/image/william-shakespeare.jpg"
-        }
-      ]
+      blogs: []
     };
   },
 
@@ -63,11 +39,27 @@ export default {
   },
 
   methods: {
-    formSubmitted() {}
+    authorsResponse(res) {
+      this.blogs = res.data;
+    }
   },
 
   components: {
     BaseCard
+  },
+
+  mounted() {
+    var settingsObj, payloadObj;
+
+    settingsObj = {
+      url: "http://authors-lumen.test/api/authors",
+      method: "GET",
+      callBack: this.authorsResponse
+    };
+
+    payloadObj = {};
+
+    this.sendAxios(payloadObj, settingsObj);
   }
 };
 </script>

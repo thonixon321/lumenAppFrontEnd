@@ -8,12 +8,7 @@
       class="bg-black shadow-md rounded-t-none px-8 pt-6 pb-8 mb-4"
     >
       <div class="mb-4">
-        <label
-          class="block text-white text-sm font-bold mb-2"
-          for="name"
-        >
-          Name
-        </label>
+        <label class="block text-white text-sm font-bold mb-2" for="name">Name</label>
         <input
           v-model="name"
           :class="{ error: msg.name !== null}"
@@ -23,18 +18,10 @@
           placeholder="Name"
           @input="msg.name = null"
         />
-        <p
-          v-if="msg.name"
-          class='text-red-500 text-xs italic'
-        >{{ msg.name }}</p>
+        <p v-if="msg.name" class="text-red-500 text-xs italic">{{ msg.name }}</p>
       </div>
       <div class="mb-4">
-        <label
-          class="block text-white text-sm font-bold mb-2"
-          for="email"
-        >
-          Email
-        </label>
+        <label class="block text-white text-sm font-bold mb-2" for="email">Email</label>
         <input
           v-model="email"
           :class="{ error: msg.email !== null}"
@@ -44,18 +31,10 @@
           placeholder="email"
           @input="msg.email = null"
         />
-        <p
-          v-if="msg.email"
-          class='text-red-500 text-xs italic'
-        >{{ msg.email }}</p>
+        <p v-if="msg.email" class="text-red-500 text-xs italic">{{ msg.email }}</p>
       </div>
       <div class="mb-4">
-        <label
-          class="block text-white text-sm font-bold mb-2"
-          for="password"
-        >
-          Password
-        </label>
+        <label class="block text-white text-sm font-bold mb-2" for="password">Password</label>
         <input
           v-model="password"
           :class="{ error: msg.password !== null}"
@@ -65,18 +44,13 @@
           placeholder="******************"
           @input="msg.password = null, msg.passwordConfirmed = null, passwordConfirmed = null"
         />
-        <p
-          v-if="msg.password"
-          class='text-red-500 text-xs italic'
-        >{{ msg.password }}</p>
+        <p v-if="msg.password" class="text-red-500 text-xs italic">{{ msg.password }}</p>
       </div>
       <div class="mb-6">
         <label
           class="block text-white text-sm font-bold mb-2"
           for="confirm_password"
-        >
-          Confirm Password
-        </label>
+        >Confirm Password</label>
         <input
           v-model="passwordConfirmed"
           :class="{ error: msg.passwordConfirmed !== null}"
@@ -88,24 +62,25 @@
         />
         <p
           v-if="msg.passwordConfirmed"
-          class='text-red-500 text-xs italic'
+          class="text-red-500 text-xs italic"
         >{{ msg.passwordConfirmed }}</p>
       </div>
       <div class="flex items-center justify-between">
         <button
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
-        >
-          Sign Up
-        </button>
+        >Sign Up</button>
       </div>
     </form>
   </div>
 </template>
 
 <script>
+import { axiosHandler } from "../mixins/axiosHandler";
 export default {
   name: "SignUpForm",
+
+  mixins: [axiosHandler],
 
   props: {
     drawer: {
@@ -133,15 +108,42 @@ export default {
   methods: {
     async formSubmitted() {
       let validFields = await this.validateFields();
+      let settingsObj, payloadObj;
       if (validFields) {
+        settingsObj = {
+          url: "http://authors-lumen.test/api/register",
+          method: "POST",
+          callBack: this.formSubmittedResponse
+        };
+
+        payloadObj = {
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          password_confirmation: this.passwordConfirmed
+        };
+
+        this.sendAxios(payloadObj, settingsObj);
+      } else {
+        this.errorShake = true;
+
+        setTimeout(() => {
+          this.errorShake = false;
+        }, 1000);
+      }
+    },
+
+    formSubmittedResponse(res) {
+      console.log(res);
+      //upon successful axios response
+      if (res.status === 201) {
         this.$emit("close");
-        //upon successful axios response
-        this.$store.dispatch("updateLoggedInStatus", true);
+
         this.$store.dispatch("updateAlert", {
           alert: true,
           alertSuccess: true,
           alertTitle: "Success!",
-          alertMessage: "You were signed up successfully"
+          alertMessage: "You were signed up successfully! You can now login!"
         });
 
         setTimeout(() => {
@@ -153,11 +155,21 @@ export default {
           });
         }, 1500);
       } else {
-        this.errorShake = true;
+        this.$store.dispatch("updateAlert", {
+          alert: true,
+          alertSuccess: false,
+          alertTitle: "Failed",
+          alertMessage: "Something went wrong with this request"
+        });
 
         setTimeout(() => {
-          this.errorShake = false;
-        }, 1000);
+          this.$store.dispatch("updateAlert", {
+            alert: false,
+            alertSuccess: false,
+            alertTitle: "",
+            alertMessage: ""
+          });
+        }, 1500);
       }
     },
 

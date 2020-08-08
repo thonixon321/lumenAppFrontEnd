@@ -5,6 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    api_token: "",
     loggedIn: false,
     alertObj: {
       alert: false,
@@ -21,6 +22,10 @@ export default new Vuex.Store({
     CHANGE_ALERT_OBJ(state, data) {
       state.alertObj = data;
     },
+
+    SET_API_TOKEN(state, token) {
+      state.api_token = token;
+    },
   },
   actions: {
     updateLoggedInStatus({ commit }, status) {
@@ -29,6 +34,10 @@ export default new Vuex.Store({
 
     updateAlert({ commit }, data) {
       commit("CHANGE_ALERT_OBJ", data);
+    },
+
+    setToken({ commit }, token) {
+      commit("SET_API_TOKEN", token);
     },
   },
   modules: {},
