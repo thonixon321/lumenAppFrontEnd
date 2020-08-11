@@ -3,6 +3,7 @@
     <base-card
       v-for="(card, index) in blogs"
       :key="index"
+      :id="card.id"
       :author="card.user.name"
       :title="card.blog_title"
       :body="card.blog_body"

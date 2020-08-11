@@ -29,7 +29,7 @@
           </p>
           <div class="flex justify-end" v-if="showEdit || showDelete">
             <base-button @clicked="changePage" v-if="showEdit" :icon="true" type="editIcon"></base-button>
-            <base-button v-if="showDelete" :icon="true" type="trashIcon"></base-button>
+            <base-button @clicked="deleteBlog" v-if="showDelete" :icon="true" type="trashIcon"></base-button>
           </div>
           <div class="text-gray-900 font-bold text-xl mb-2">{{ title }}</div>
           <p class="text-gray-700 text-base">{{ body }}</p>
@@ -52,13 +52,20 @@
 </template>
 
 <script>
+import { axiosHandler } from "../mixins/axiosHandler";
 import BaseButton from "./BaseButton";
 import { mapState } from "vuex";
 
 export default {
   name: "BaseCard",
 
+  mixins: [axiosHandler],
+
   props: {
+    id: {
+      type: String,
+      default: "1"
+    },
     showEdit: {
       type: Boolean,
       default: false
@@ -120,6 +127,7 @@ export default {
             params: {
               blog: {
                 readonly: true,
+                id: this.id,
                 title: this.title,
                 author: this.author,
                 body: this.body,
@@ -135,6 +143,7 @@ export default {
             params: {
               blog: {
                 readonly: false,
+                id: this.id,
                 title: this.title,
                 author: this.author,
                 body: this.body,
@@ -171,6 +180,24 @@ export default {
       } else {
         return;
       }
+    },
+
+    deleteBlog() {
+      let settingsObj, payloadObj;
+
+      settingsObj = {
+        url: "http://authors-lumen.test/api/authors/" + this.id,
+        method: "DELETE",
+        callBack: this.deleteResponse
+      };
+
+      payloadObj = {};
+
+      this.sendAxios(payloadObj, settingsObj);
+    },
+
+    deleteResponse(res) {
+      console.log(res);
     }
   },
 

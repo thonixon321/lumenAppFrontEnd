@@ -6,6 +6,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     api_token: "",
+    user_id: "",
     loggedIn: false,
     alertObj: {
       alert: false,
@@ -26,6 +27,10 @@ export default new Vuex.Store({
     SET_API_TOKEN(state, token) {
       state.api_token = token;
     },
+
+    SET_USER_ID(state, id) {
+      state.user_id = id;
+    },
   },
   actions: {
     updateLoggedInStatus({ commit }, status) {
@@ -38,6 +43,10 @@ export default new Vuex.Store({
 
     setToken({ commit }, token) {
       commit("SET_API_TOKEN", token);
+    },
+
+    setUserId({ commit }, id) {
+      commit("SET_USER_ID", id);
     },
   },
   modules: {},

@@ -139,6 +139,8 @@ export default {
       if (res.status === 201) {
         this.$emit("close");
 
+        this.$store.dispatch("setUserId", res.data.user.id);
+
         this.$store.dispatch("updateAlert", {
           alert: true,
           alertSuccess: true,

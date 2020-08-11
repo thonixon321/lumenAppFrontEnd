@@ -7,12 +7,7 @@
       class="bg-blue-200 shadow-md rounded-t-none mx-12 px-8 pt-6 pb-8 mb-4"
     >
       <div class="mb-4">
-        <label
-          class="block text-black text-sm font-bold mb-2"
-          for="title"
-        >
-          Title:
-        </label>
+        <label class="block text-black text-sm font-bold mb-2" for="title">Title:</label>
         <input
           v-model="title"
           :class="{ error: msg.title !== null}"
@@ -22,20 +17,10 @@
           placeholder="Title"
           @input="msg.title = null"
         />
-        <p
-          v-if="msg.title"
-          class="text-red-500 text-xs italic"
-        >
-          {{ msg.title }}
-        </p>
+        <p v-if="msg.title" class="text-red-500 text-xs italic">{{ msg.title }}</p>
       </div>
       <div class="mb-4">
-        <label
-          class="block text-black text-sm font-bold mb-2"
-          for="body"
-        >
-          Body:
-        </label>
+        <label class="block text-black text-sm font-bold mb-2" for="body">Body:</label>
         <textarea
           v-model="body"
           :class="{ error: msg.body !== null}"
@@ -44,14 +29,8 @@
           type="text"
           placeholder="Body"
           @input="msg.body = null"
-        >
-        </textarea>
-        <p
-          v-if="msg.body"
-          class="text-red-500 text-xs italic"
-        >
-          {{ msg.body }}
-        </p>
+        ></textarea>
+        <p v-if="msg.body" class="text-red-500 text-xs italic">{{ msg.body }}</p>
       </div>
       <div class="mb-4 flex">
         <input
@@ -74,32 +53,29 @@
           type="button"
           class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
           @click="$refs.fileAuthorInput.click()"
-        >
-          Upload Author Image
-        </button>
+        >Upload Author Image</button>
         <button
           type="button"
           class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow ml-2"
           @click="$refs.fileBlogInput.click()"
-        >
-          Upload Blog Image
-        </button>
+        >Upload Blog Image</button>
       </div>
       <div class="flex items-center justify-between">
         <button
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
-        >
-          Publish
-        </button>
+        >Publish</button>
       </div>
     </form>
   </div>
 </template>
 
 <script>
+import { axiosHandler } from "../mixins/axiosHandler";
 export default {
   name: "AddBlog",
+
+  mixins: [axiosHandler],
 
   data() {
     return {
@@ -115,13 +91,32 @@ export default {
     };
   },
 
+  // 'user_id' => 'required',
+  //           'blog_title' => 'required',
+  //           'blog_body' => 'required',
+
   methods: {
     async formSubmitted() {
       let validFields = await this.validateFields();
+      let settingsObj, payloadObj;
       // const fd = new FormData();
       // fd.append("image", this.selectedFile, this.selectedFile.name);
 
       if (validFields) {
+        settingsObj = {
+          url: "http://authors-lumen.test/api/authors",
+          method: "POST",
+          callBack: this.formSubmittedResponse
+        };
+
+        payloadObj = {
+          user_id: this.$store.state.user_id,
+          blog_title: this.title,
+          blog_body: this.body
+        };
+
+        this.sendAxios(payloadObj, settingsObj);
+
         this.$store.dispatch("updateAlert", {
           alert: true,
           alertSuccess: true,
@@ -145,6 +140,8 @@ export default {
         }, 1000);
       }
     },
+
+    formSubmittedResponse(res) {},
 
     authorFileSelected(event) {
       console.log(event);
